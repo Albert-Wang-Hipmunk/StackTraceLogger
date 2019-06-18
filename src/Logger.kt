@@ -34,7 +34,11 @@ class Logger {
         }
 
         fun logMethod(offset: Int = 0) {
-            val count = 2 + offset
+            val count = getStackCount() - offset + 1
+//            println("logMethod: count=$count")
+//            val count = 2 + offset
+
+
             val stackTraceStack = Thread.currentThread().stackTrace
             val stackTrace = stackTraceStack[count]
             val fileName = stackTrace.fileName
@@ -43,9 +47,10 @@ class Logger {
             val methodName = stackTrace.methodName
             val msg = "$fileName($lineNumber) - $methodName"
 
-            println("[$fileName-$lineNumber]: ($className-$methodName): $msg")
+            println(msg)
         }
 
+        fun getStackCount(): Int = Thread.currentThread().stackTrace.size
         fun getCallerName(): String {
             val stackTrace = Thread.currentThread().stackTrace
             val traceElement = stackTrace[2]
@@ -68,8 +73,22 @@ class Wrapper {
             logMe()
         }
 
+        fun wrapperName(name: String) {
+            Logger.logMethodByName(name)
+        }
+
+        fun wrapperCount(count: Int) {
+            Logger.logMethod(count)
+        }
+
         fun logMe() {
             Logger.logMethodByName(Logger.getCallerName())
+            Logger.logMethod(Logger.getStackCount())
+
+            wrapperCount(Logger.getStackCount())
+            wrapperName(Logger.getCallerName())
+
+            println("--- done ---")
         }
     }
 }
